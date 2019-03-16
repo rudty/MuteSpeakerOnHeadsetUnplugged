@@ -7,7 +7,12 @@ for windows tablet, mute speaker when headset unplugged
 
 윈도우 태블릿에서 다른 이어폰/헤드셋 제거 시 음소거 설정
 
+---
+
+
 사용 방법
+
+
 파일을 다운로드 후 작업 스케줄러나 시작 프로그램에 등록
 시작 프로그램 등록 설정 
 
@@ -30,5 +35,9 @@ for windows tablet, mute speaker when headset unplugged
 
 ### 이어폰 제거 시 음소거 확인 가능 
 ![info](https://user-images.githubusercontent.com/16451719/54469504-2de6fa00-47dc-11e9-9fb2-761b8ffc7564.png)
+
+
+---
+
 
 License:GPL3
