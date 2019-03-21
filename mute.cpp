@@ -6,7 +6,9 @@
 #define SAFE_RELEASE(punk)  \
               if ((punk) != NULL)  \
                 { (punk)->Release(); (punk) = NULL; }
-
+#define EXIT_IF_FAILED(__RUN__) if(FAILED(__RUN__)) { \
+									MessageBoxA(NULL, "RUN_FAILED", "mute", MB_OK);\
+									exit(1); }
 class CMMNotificationClient : public IMMNotificationClient
 {
 	
@@ -22,19 +24,20 @@ public:
 		 * 나머지는 해제
 		 */
 		IMMDeviceEnumerator *deviceEnumerator = nullptr;
-		const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
-		const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
-		auto result = CoCreateInstance(
-			CLSID_MMDeviceEnumerator, NULL,
-			CLSCTX_ALL, IID_IMMDeviceEnumerator,
-			(void**)&deviceEnumerator);
+		EXIT_IF_FAILED(CoCreateInstance(
+			__uuidof(MMDeviceEnumerator), 
+			nullptr,
+			CLSCTX_ALL, 
+			__uuidof(IMMDeviceEnumerator),
+			(void**)&deviceEnumerator));
 
-		deviceEnumerator->RegisterEndpointNotificationCallback(this);
-
+		EXIT_IF_FAILED(deviceEnumerator->RegisterEndpointNotificationCallback(this));
+		
 		IMMDevice* device = nullptr;
-		deviceEnumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &device);
+		EXIT_IF_FAILED(deviceEnumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &device));
 
-		device->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_ALL, nullptr, (void**)&defaultAudioVolume);
+		EXIT_IF_FAILED(device->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_ALL, nullptr, (void**)&defaultAudioVolume));
+		
 		SAFE_RELEASE(device);
 		SAFE_RELEASE(deviceEnumerator);
 	}
@@ -47,9 +50,15 @@ public:
 		switch (dwNewState)
 		{
 		case DEVICE_STATE_ACTIVE:
+#ifdef _DEBUG
+			printf("DEVICE_STATE_ACTIVE\n");
+#endif
 			break;
 		case DEVICE_STATE_UNPLUGGED:
 			defaultAudioVolume->SetMute(true, nullptr);
+#ifdef _DEBUG
+			printf("DEVICE_STATE_UNPLUGGED\n");
+#endif
 			break;
 		}
 		return S_OK;
@@ -70,6 +79,9 @@ public:
 		return S_OK;
 	}
 	
+	/**
+	 * 이 아래부터는 사용하지 않는 IMM 이벤트이므로 그냥 S_OK 반환
+	 */
 	HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId){
 		return S_OK;
 	}
@@ -86,12 +98,17 @@ public:
 		return S_OK;
 	}
 };
-//int main()
-//{
-//	
-//	CMMNotificationClient c;
-//	getchar(); 
-//}
+
+
+#ifdef _DEBUG
+int main() {
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	CMMNotificationClient c;
+	c.attachVolumeNotification();
+
+	getchar(); 
+}
+#else
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	CMMNotificationClient c;
@@ -101,10 +118,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//좀비 프로세스처럼 동작할거라서 
 	//계속 꺼지지않아도 상관없음
 	MSG msg;
-	while (GetMessage(&msg, 0, 0, 0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
+	while (GetMessage(&msg, 0, 0, 0));
 	return 0; 
 }
+#endif
