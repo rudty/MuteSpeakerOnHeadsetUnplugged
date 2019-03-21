@@ -2,7 +2,8 @@
 for windows tablet, mute speaker when headset unplugged
 
 
-[**다운로드Download**](https://github.com/rudty/MuteSpeakerOnHeadsetUnplugged/releases/download/v1/mutev1.zip)
+[**다운로드Download x86**](https://github.com/rudty/MuteSpeakerOnHeadsetUnplugged/releases/download/v2/mute_x86.zip)
+[**다운로드Download x64**](https://github.com/rudty/MuteSpeakerOnHeadsetUnplugged/releases/download/v2/mute_x64.zip)
 
 
 윈도우 태블릿에서 다른 이어폰/헤드셋 제거 시 음소거 설정
