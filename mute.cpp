@@ -118,7 +118,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//좀비 프로세스처럼 동작할거라서 
 	//계속 꺼지지않아도 상관없음
 	MSG msg;
-	while (GetMessage(&msg, 0, 0, 0));
+	while (GetMessage(&msg, 0, 0, 0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 	return 0; 
 }
 #endif
